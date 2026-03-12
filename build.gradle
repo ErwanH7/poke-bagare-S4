@@ -1,6 +1,7 @@
 plugins {
   id 'application'
   id 'org.openjfx.javafxplugin' version '0.0.13'
+  id 'jacoco'
 }
 
 group 'com.montaury'
@@ -17,7 +18,28 @@ javafx {
 
 test {
   useJUnitPlatform()
+  finalizedBy jacocoTestReport
 }
+
+jacocoTestReport {
+  dependsOn test
+  reports {
+    xml.required = true
+    html.required = true
+  }
+}
+
+jacocoTestCoverageVerification {
+  violationRules {
+    rule {
+      limit {
+        minimum = 0.8  // 80% de coverage minimum
+      }
+    }
+  }
+}
+
+check.dependsOn jacocoTestCoverageVerification
 
 dependencies {
   implementation 'com.google.code.gson:gson:2.10'
