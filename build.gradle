@@ -17,11 +17,12 @@ javafx {
 }
 
 test {
+
   useJUnitPlatform()
   finalizedBy jacocoTestReport
-  systemProperties['java.awt.headless'] = true
+  systemProperties['java.awt.headless'] = true //passer en false en local pour voir le test
   systemProperties['testfx.robot'] = 'glass'
-  systemProperties['testfx.headless'] = 'true'
+  systemProperties['testfx.headless'] = 'true' //passer en false en local pour voir le test
 }
 
 jacocoTestReport {
