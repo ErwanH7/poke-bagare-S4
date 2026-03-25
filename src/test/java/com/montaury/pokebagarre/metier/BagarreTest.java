@@ -30,7 +30,14 @@ class BagarreTest {
 
     @Test
     void doit_lever_erreur_si_premier_pokemon_est_null() {
-        Throwable thrown = catchThrowable(() -> bagarre.demarrer(null, "pikachu"));
+        // Given
+        String premierPokemon = null;
+        String secondPokemon = "pikachu";
+
+        // When
+        Throwable thrown = catchThrowable(() -> bagarre.demarrer(premierPokemon, secondPokemon));
+
+        // Then
         assertThat(thrown)
                 .isInstanceOf(ErreurPokemonNonRenseigne.class)
                 .hasMessage("Le premier pokemon n'est pas renseigne");
@@ -38,7 +45,14 @@ class BagarreTest {
 
     @Test
     void doit_lever_erreur_si_premier_pokemon_est_vide() {
-        Throwable thrown = catchThrowable(() -> bagarre.demarrer("", "pikachu"));
+        // Given
+        String premierPokemon = "";
+        String secondPokemon = "pikachu";
+
+        // When
+        Throwable thrown = catchThrowable(() -> bagarre.demarrer(premierPokemon, secondPokemon));
+
+        // Then
         assertThat(thrown)
                 .isInstanceOf(ErreurPokemonNonRenseigne.class)
                 .hasMessage("Le premier pokemon n'est pas renseigne");
@@ -48,7 +62,14 @@ class BagarreTest {
 
     @Test
     void doit_lever_erreur_si_les_deux_pokemons_sont_identiques() {
-        Throwable thrown = catchThrowable(() -> bagarre.demarrer("pikachu", "pikachu"));
+        // Given
+        String premierPokemon = "pikachu";
+        String secondPokemon = "pikachu";
+
+        // When
+        Throwable thrown = catchThrowable(() -> bagarre.demarrer(premierPokemon, secondPokemon));
+
+        // Then
         assertThat(thrown)
                 .isInstanceOf(ErreurMemePokemon.class)
                 .hasMessage("Impossible de faire se bagarrer un pokemon avec lui-meme");
@@ -58,7 +79,14 @@ class BagarreTest {
 
     @Test
     void doit_lever_erreur_si_second_pokemon_est_vide() {
-        Throwable thrown = catchThrowable(() -> bagarre.demarrer("pikachu", ""));
+        // Given
+        String premierPokemon = "pikachu";
+        String secondPokemon = "";
+
+        // When
+        Throwable thrown = catchThrowable(() -> bagarre.demarrer(premierPokemon, secondPokemon));
+
+        // Then
         assertThat(thrown)
                 .isInstanceOf(ErreurPokemonNonRenseigne.class)
                 .hasMessage("Le second pokemon n'est pas renseigne");
@@ -66,7 +94,14 @@ class BagarreTest {
 
     @Test
     void doit_lever_erreur_si_second_pokemon_est_null() {
-        Throwable thrown = catchThrowable(() -> bagarre.demarrer("pikachu", null));
+        // Given
+        String premierPokemon = "pikachu";
+        String secondPokemon = null;
+
+        // When
+        Throwable thrown = catchThrowable(() -> bagarre.demarrer(premierPokemon, secondPokemon));
+
+        // Then
         assertThat(thrown)
                 .isInstanceOf(ErreurPokemonNonRenseigne.class)
                 .hasMessage("Le second pokemon n'est pas renseigne");
@@ -76,13 +111,16 @@ class BagarreTest {
 
     @Test
     void doit_echouer_si_lapi_ne_trouve_pas_le_premier_pokemon() {
+        // Given
         Mockito.when(fausseApi.recupererParNom("inconnu"))
-                .thenReturn(CompletableFuture.failedFuture(new ErreurRecuperationPokemon("inconnu")));
+                    .thenReturn(CompletableFuture.failedFuture(new ErreurRecuperationPokemon("inconnu")));
         Mockito.when(fausseApi.recupererParNom("pikachu"))
                 .thenReturn(CompletableFuture.completedFuture(new Pokemon("pikachu", "url", new Stats(50, 30))));
 
+        // When
         var futur = bagarre.demarrer("inconnu", "pikachu");
 
+        // Then
         assertThat(futur)
                 .failsWithin(Duration.ofSeconds(2))
                 .withThrowableOfType(ExecutionException.class)
@@ -93,13 +131,16 @@ class BagarreTest {
 
     @Test
     void doit_echouer_si_lapi_ne_trouve_pas_le_second_pokemon() {
+        // Given
         Mockito.when(fausseApi.recupererParNom("pikachu"))
                 .thenReturn(CompletableFuture.completedFuture(new Pokemon("pikachu", "url", new Stats(50, 30))));
         Mockito.when(fausseApi.recupererParNom("inconnu"))
                 .thenReturn(CompletableFuture.failedFuture(new ErreurRecuperationPokemon("inconnu")));
 
+        // When
         var futur = bagarre.demarrer("pikachu", "inconnu");
 
+        // Then
         assertThat(futur)
                 .failsWithin(Duration.ofSeconds(2))
                 .withThrowableOfType(ExecutionException.class)
@@ -112,13 +153,16 @@ class BagarreTest {
 
     @Test
     void doit_retourner_le_premier_pokemon_quand_il_gagne() {
+        // Given
         Mockito.when(fausseApi.recupererParNom("pikachu"))
                 .thenReturn(CompletableFuture.completedFuture(new Pokemon("pikachu", "url1", new Stats(100, 30))));
         Mockito.when(fausseApi.recupererParNom("bulbizarre"))
                 .thenReturn(CompletableFuture.completedFuture(new Pokemon("bulbizarre", "url2", new Stats(50, 30))));
 
+        // When
         var futur = bagarre.demarrer("pikachu", "bulbizarre");
 
+        // Then
         assertThat(futur)
                 .succeedsWithin(Duration.ofSeconds(2))
                 .satisfies(pokemon -> assertThat(pokemon.getNom()).isEqualTo("pikachu"));
@@ -126,13 +170,16 @@ class BagarreTest {
 
     @Test
     void doit_retourner_le_second_pokemon_quand_il_gagne() {
+        // Given
         Mockito.when(fausseApi.recupererParNom("pikachu"))
                 .thenReturn(CompletableFuture.completedFuture(new Pokemon("pikachu", "url1", new Stats(30, 30))));
         Mockito.when(fausseApi.recupererParNom("bulbizarre"))
                 .thenReturn(CompletableFuture.completedFuture(new Pokemon("bulbizarre", "url2", new Stats(80, 30))));
 
+        // When
         var futur = bagarre.demarrer("pikachu", "bulbizarre");
 
+        // Then
         assertThat(futur)
                 .succeedsWithin(Duration.ofSeconds(2))
                 .satisfies(pokemon -> assertThat(pokemon.getNom()).isEqualTo("bulbizarre"));
