@@ -24,11 +24,14 @@ class PokeBagarreAppTest {
 
     @Test
     void erreur_si_premier_pokemon_non_renseigne(FxRobot robot) {
-        // Le champ du premier pokemon est vide, le second est rempli
+        // Given : le champ du premier pokemon est vide, le second est rempli
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_2);
         robot.write("Pikachu");
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : un message d'erreur indique que le premier pokemon n'est pas renseigné
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getMessageErreur(robot))
                 .isEqualTo("Erreur: Le premier pokemon n'est pas renseigne")
@@ -37,11 +40,14 @@ class PokeBagarreAppTest {
 
     @Test
     void erreur_si_second_pokemon_non_renseigne(FxRobot robot) {
-        // Le champ du second pokemon est vide, le premier est rempli
+        // Given : le champ du second pokemon est vide, le premier est rempli
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_1);
         robot.write("Pikachu");
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : un message d'erreur indique que le second pokemon n'est pas renseigné
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getMessageErreur(robot))
                 .isEqualTo("Erreur: Le second pokemon n'est pas renseigne")
@@ -50,9 +56,12 @@ class PokeBagarreAppTest {
 
     @Test
     void erreur_si_les_deux_champs_sont_vides(FxRobot robot) {
-        // Les deux champs sont vides
+        // Given : les deux champs sont vides
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : un message d'erreur indique que le premier pokemon n'est pas renseigné
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getMessageErreur(robot))
                 .isEqualTo("Erreur: Le premier pokemon n'est pas renseigne")
@@ -61,13 +70,16 @@ class PokeBagarreAppTest {
 
     @Test
     void erreur_si_meme_pokemon_dans_les_deux_champs(FxRobot robot) {
-        // Les deux champs contiennent le même nom de pokemon
+        // Given : les deux champs contiennent le même nom de pokemon
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_1);
         robot.write("Pikachu");
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_2);
         robot.write("Pikachu");
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : un message d'erreur indique qu'un pokemon ne peut pas se bagarrer avec lui-même
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getMessageErreur(robot))
                 .isEqualTo("Erreur: Impossible de faire se bagarrer un pokemon avec lui-meme")
@@ -76,13 +88,16 @@ class PokeBagarreAppTest {
 
     @Test
     void erreur_si_meme_pokemon_avec_casse_differente(FxRobot robot) {
-        // Le même pokemon avec des majuscules différentes doit aussi être refusé
+        // Given : les deux champs contiennent le même nom avec des majuscules différentes
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_1);
         robot.write("pikachu");
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_2);
         robot.write("PIKACHU");
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : un message d'erreur indique qu'un pokemon ne peut pas se bagarrer avec lui-même
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getMessageErreur(robot))
                 .isEqualTo("Erreur: Impossible de faire se bagarrer un pokemon avec lui-meme")
@@ -91,13 +106,16 @@ class PokeBagarreAppTest {
 
     @Test
     void erreur_si_meme_pokemon_avec_espaces(FxRobot robot) {
-        // Le même pokemon avec des espaces autour doit aussi être refusé
+        // Given : les deux champs contiennent le même nom, le second entouré d'espaces
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_1);
         robot.write("Pikachu");
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_2);
         robot.write("  Pikachu  ");
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : un message d'erreur indique qu'un pokemon ne peut pas se bagarrer avec lui-même
         await().atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getMessageErreur(robot))
                 .isEqualTo("Erreur: Impossible de faire se bagarrer un pokemon avec lui-meme")
@@ -106,13 +124,16 @@ class PokeBagarreAppTest {
 
     @Test
     void affiche_le_vainqueur_apres_une_bagarre_valide(FxRobot robot) {
-        // Scénario nominal : deux pokémons différents → l'API répond et le vainqueur s'affiche
+        // Given : deux pokémons différents sont saisis
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_1);
         robot.write("pikachu");
         robot.clickOn(IDENTIFIANT_CHAMP_DE_SAISIE_POKEMON_2);
         robot.write("bulbasaur");
+
+        // When : l'utilisateur clique sur le bouton Bagarre
         robot.clickOn(IDENTIFIANT_BOUTON_BAGARRE);
 
+        // Then : le nom du vainqueur s'affiche après la réponse de l'API
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() ->
             assertThat(getResultatBagarre(robot))
                 .startsWith("Le vainqueur est: ")
